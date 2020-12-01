@@ -101,13 +101,26 @@ elif [ "${1}" != "install" ]; then
 		echo "You need to run 'install.sh' first."
 		exit 1
 	fi
+
+	UWP_CMD="shell:appsFolder\\${PACKAGE_FAMILY_NAME}!${APP_ID}"
 	if [ -n "${2}" ]; then
 		dprint "HOME:${HOME}"
 		FILE=$(echo "${2}" | sed 's|'"${HOME}"'|\\\\tsclient\\home|;s|/|\\|g;s|\\|\\\\|g')
 		dprint "FILE:${FILE}"
-		xfreerdp "${HOME}/.config/winapps/${RDP_HOSTNAME:-RDPWindows}.rdp" ${RDP_FLAGS} /v:${RDP_IP} +auto-reconnect +clipboard +home-drive -wallpaper +window-drag /scale:${RDP_SCALE} /dynamic-resolution ${MULTI_FLAG} /wm-class:"${FULL_NAME}" /app:"${WIN_EXECUTABLE}" /app-icon:"${ICON}" /app-cmd:"\"${FILE}\"" /sound /microphone 1> /dev/null 2>&1 &
+		if [ -z "${PACKAGE_FAMILY_NAME}" ]; then
+			APP_ARGS="\"${FILE}\""
+		else
+			APP_ARGS="${UWP_CMD} \"${FILE}\""
+		fi
+
+		xfreerdp "${HOME}/.config/winapps/${RDP_HOSTNAME:-RDPWindows}.rdp" ${RDP_FLAGS} /v:${RDP_IP} +auto-reconnect +clipboard +home-drive -wallpaper +window-drag /scale:${RDP_SCALE} /dynamic-resolution ${MULTI_FLAG} /wm-class:"${FULL_NAME}" /app:"${WIN_EXECUTABLE}" /app-icon:"${ICON}" /app-cmd:"\"${APP_ARGS}\"" /sound /microphone 1> /dev/null 2>&1 &
 	else
-		xfreerdp "${HOME}/.config/winapps/${RDP_HOSTNAME:-RDPWindows}.rdp" ${RDP_FLAGS} /v:${RDP_IP} +auto-reconnect +clipboard +home-drive -wallpaper +window-drag /scale:${RDP_SCALE} /dynamic-resolution ${MULTI_FLAG} /wm-class:"${FULL_NAME}" /app:"${WIN_EXECUTABLE}" /app-icon:"${ICON}" /sound /microphone 1> /dev/null 2>&1 &
+		if [ -z "${PACKAGE_FAMILY_NAME}" ]; then
+			APP_ARGS=""
+		else
+			APP_ARGS="${UWP_CMD}"
+		fi
+		xfreerdp "${HOME}/.config/winapps/${RDP_HOSTNAME:-RDPWindows}.rdp" ${RDP_FLAGS} /v:${RDP_IP} +auto-reconnect +clipboard +home-drive -wallpaper +window-drag /scale:${RDP_SCALE} /dynamic-resolution ${MULTI_FLAG} /wm-class:"${FULL_NAME}" /app:"${WIN_EXECUTABLE}" /app-icon:"${ICON}" /app-cmd:"${APP_ARGS}" /sound /microphone 1> /dev/null 2>&1 &
 	fi
 fi
 
