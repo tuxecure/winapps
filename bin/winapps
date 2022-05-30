@@ -54,12 +54,12 @@ if [ -z "${RDP_IP}" ]; then
 		echo '  sudo usermod -a -G kvm $(whoami)'
 		exit
 	fi
-	if [ -z "$(virsh list |grep RDPWindows)" ]; then
-		echo "RDPWindows is not running, run:"
-		echo "  virsh start RDPWindows"
+	if [ -z "$(virsh list |grep ${RDP_HOSTNAME:-RDPWindows})" ]; then
+		echo "${RDP_HOSTNAME:-RDPWindows} is not running, run:"
+		echo "  virsh start ${RDP_HOSTNAME:-RDPWindows}"
 		exit
 	fi
-	RDP_IP=$(virsh net-dhcp-leases default |grep RDPWindows |awk '{print $5}')
+	RDP_IP=$(virsh net-dhcp-leases default |grep ${RDP_HOSTNAME:-RDPWindows} |awk '{print $5}')
 	RDP_IP=${RDP_IP%%\/*}
 fi
 
