@@ -97,6 +97,7 @@ To get things going, use:
 sudo apt-get install -y freerdp2-x11
 git clone https://github.com/Fmstrat/winapps.git
 cd winapps
+git submodule update --init
 ```
 ### Step 3: Creating your WinApps configuration file
 You will need to create a `~/.config/winapps/winapps.conf` configuration file with the following information in it:
