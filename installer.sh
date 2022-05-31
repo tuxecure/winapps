@@ -36,12 +36,14 @@ function waFindInstalled() {
 		rm -f ${HOME}/.local/share/winapps/detected
 		cp "${DIR}/install/ExtractPrograms.ps1" ${HOME}/.local/share/winapps/ExtractPrograms.ps1
 		for F in $(ls "${DIR}/apps"); do
-			. "${DIR}/apps/${F}/info"
-			echo "IF EXIST \"${WIN_EXECUTABLE}\" ECHO ${F} >> \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp" >> ${HOME}/.local/share/winapps/installed.bat
+			if [[ -d "${DIR}/apps/${F}" ]]; then
+                            . "${DIR}/apps/${F}/info"
+			    [[ ${F} != "windows" ]] && echo "IF EXIST \"${WIN_EXECUTABLE}\" ECHO ${F} >> \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp" >> ${HOME}/.local/share/winapps/installed.bat
+                        fi
 		done;
 		echo "powershell.exe -ExecutionPolicy Bypass -File \\\\tsclient\\home\\.local\\share\\winapps\\ExtractPrograms.ps1 > \\\\tsclient\home\\.local\\share\\winapps\\detected" >> ${HOME}/.local/share/winapps/installed.bat
 		echo "RENAME \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp installed" >> ${HOME}/.local/share/winapps/installed.bat
-		xfreerdp /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} +auto-reconnect +home-drive -wallpaper /span /wm-class:"RDPInstaller" /app:"C:\Windows\System32\cmd.exe" /app-icon:"${DIR}/../icons/windows.svg" /app-cmd:"/C \\\\tsclient\\home\\.local\\share\\winapps\\installed.bat" 1> /dev/null 2>&1 &
+		xfreerdp /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} +auto-reconnect +home-drive -wallpaper /span /wm-class:"RDPInstaller" /app:"C:\Windows\System32\cmd.exe" /app-icon:"${DIR}/apps/windows/windows.svg" /app-cmd:"/C \\\\tsclient\\home\\.local\\share\\winapps\\installed.bat" 1> /dev/null 2>&1 &
 		COUNT=0
 		while [ ! -f "${HOME}/.local/share/winapps/installed" ]; do
 			sleep 5
@@ -75,7 +77,7 @@ function waFindInstalled() {
 }
 
 function waConfigureApp() {
-		. "${SYS_PATH}/apps/${1}/info"
+		[[ -d "${SYS_PATH}/apps/${1}" ]] && . "${SYS_PATH}/apps/${1}/info"
 		echo -n "  Configuring ${NAME}..."
 		if [ ${USEDEMO} != 1 ]; then
 			${SUDO} rm -f "${APP_PATH}/${1}.desktop"
@@ -102,7 +104,7 @@ ${BIN_PATH}/winapps ${1} $@
 function waConfigureApps() {
 	APPS=()
 	for F in $(cat "${HOME}/.local/share/winapps/installed" |sed 's/\r/\n/g'); do
-		. "${DIR}/apps/${F}/info"
+		[[ -d "${DIR}/apps/${F}" ]] && . "${DIR}/apps/${F}/info"
 		APPS+=("${FULL_NAME} (${F})")
 		INSTALLED_EXES+=("$(echo "${WIN_EXECUTABLE##*\\}" |tr '[:upper:]' '[:lower:]')")
 	done
@@ -210,23 +212,9 @@ function waConfigureWindows() {
 	echo -n "  Configuring Windows..."
 	if [ ${USEDEMO} != 1 ]; then
 		${SUDO} rm -f "${APP_PATH}/windows.desktop"
-		${SUDO} mkdir -p "${SYS_PATH}/icons"
-		${SUDO} cp "${DIR}/icons/windows.svg" "${SYS_PATH}/icons/windows.svg"
-		echo "[Desktop Entry]
-Name=Windows
-Exec=${BIN_PATH}/winapps windows %F
-Terminal=false
-Type=Application
-Icon=${SYS_PATH}/icons/windows.svg
-StartupWMClass=Micorosoft Windows
-Comment=Micorosoft Windows
-Categories=Windows
-" |${SUDO} tee "${APP_PATH}/windows.desktop" > /dev/null
-		${SUDO} rm -f "${BIN_PATH}/windows"
-		echo "#!/usr/bin/env bash
-${BIN_PATH}/winapps windows
-" |${SUDO} tee "/${BIN_PATH}/windows" > /dev/null
-		${SUDO} chmod a+x "${BIN_PATH}/windows"
+                ${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
+		waConfigureApp "windows" svg
+
 	fi
 	echo " Finished."
 }
