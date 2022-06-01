@@ -47,6 +47,7 @@ function waFindInstalled() {
 		COUNT=0
 		while [ ! -f "${HOME}/.local/share/winapps/installed" ]; do
 			sleep 5
+                        echo $((15-${COUNT}))
 			COUNT=$((COUNT + 1))
 			if (( COUNT == 15 )); then
 				echo " Finished."
@@ -78,7 +79,10 @@ function waFindInstalled() {
 
 function waConfigureApp() {
 		[[ -d "${SYS_PATH}/apps/${1}" ]] && . "${SYS_PATH}/apps/${1}/info"
-		echo -n "  Configuring ${NAME}..."
+                if [[ ${NAME} != "Windows" ]]; then
+                    echo -n "  Configuring ${NAME}..."
+                    MIMETYPE="MimeType=${MIME_TYPES}"
+                fi
 		if [ ${USEDEMO} != 1 ]; then
 			${SUDO} rm -f "${APP_PATH}/${1}.desktop"
 			echo "[Desktop Entry]
@@ -90,7 +94,7 @@ Icon=${SYS_PATH}/apps/${1}/icon.${2}
 StartupWMClass=${FULL_NAME}
 Comment=${FULL_NAME}
 Categories=${CATEGORIES}
-MimeType=${MIME_TYPES}
+${MIMETYPE}
 " |${SUDO} tee "${APP_PATH}/${1}.desktop" > /dev/null
 			${SUDO} rm -f "${BIN_PATH}/${1}"
 			echo "#!/usr/bin/env bash
