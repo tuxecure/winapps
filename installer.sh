@@ -90,7 +90,7 @@ function waConfigureApp() {
                         else
                             ICON="winapps-${1}"
                         fi
-			${SUDO} rm -f "${APP_PATH}/${1}.desktop"
+			${SUDO} rm -f "${APP_PATH}/winapps.${1}.desktop"
 			echo "[Desktop Entry]
 Name=${NAME}
 Exec=${BIN_PATH}/${1} %F
@@ -101,7 +101,7 @@ StartupWMClass=${FULL_NAME}
 Comment=${FULL_NAME}
 Categories=${CATEGORIES}
 ${MIMETYPE}
-" |${SUDO} tee "${APP_PATH}/${1}.desktop" > /dev/null
+" |${SUDO} tee "${APP_PATH}/winapps.${1}.desktop" > /dev/null
 			${SUDO} rm -f "${BIN_PATH}/${1}"
 			echo "#!/usr/bin/env bash
 ${BIN_PATH}/winapps ${1} \"\$@\"
@@ -222,7 +222,7 @@ MIME_TYPES=\"\"
 function waConfigureWindows() {
 	echo -n "  Configuring Windows..."
 	if [ ${USEDEMO} != 1 ]; then
-		${SUDO} rm -f "${APP_PATH}/windows.desktop"
+		${SUDO} rm -f "${APP_PATH}/winapps.windows.desktop"
                 ${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
 		waConfigureApp "windows" svg
 
