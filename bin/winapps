@@ -87,10 +87,10 @@ elif [ "${1}" != "install" ]; then
 		ICON="${DIR}/../apps/${1}/icon.svg"
 	elif [ -e "${HOME}/.local/share/winapps/apps/${1}/info" ]; then
 		. "${HOME}/.local/share/winapps/apps/${1}/info"
-		ICON="${HOME}/.local/share/winapps/apps/${1}/icon.svg"
+		ICON="${HOME}/.local/share/winapps-${1}.svg"
 	elif [ -e "/usr/local/share/winapps/apps/${1}/info" ]; then
 		. "/usr/local/share/winapps/apps/${1}/info"
-		ICON="/usr/local/share/winapps/apps/${1}/icon.svg"
+		ICON="/usr/local/share/icons/winapps-${1}.svg"
 	else
 		echo "You need to run 'install.sh' first."
 		exit 1

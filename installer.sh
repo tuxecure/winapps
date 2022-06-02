@@ -24,6 +24,7 @@ Please run "./installer.sh --system --uninstall" first.'
 
 function waInstall() {
 	${SUDO} mkdir -p "${SYS_PATH}/apps"
+	${SUDO} mkdir -p "${ICO_PATH}"
 	. "${DIR}/bin/winapps" install
 }
 
@@ -43,7 +44,7 @@ function waFindInstalled() {
 		done;
 		echo "powershell.exe -ExecutionPolicy Bypass -File \\\\tsclient\\home\\.local\\share\\winapps\\ExtractPrograms.ps1 > \\\\tsclient\home\\.local\\share\\winapps\\detected" >> ${HOME}/.local/share/winapps/installed.bat
 		echo "RENAME \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp installed" >> ${HOME}/.local/share/winapps/installed.bat
-		xfreerdp /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} +auto-reconnect +home-drive -wallpaper /span /wm-class:"RDPInstaller" /app:"C:\Windows\System32\cmd.exe" /app-icon:"${DIR}/apps/windows/windows.svg" /app-cmd:"/C \\\\tsclient\\home\\.local\\share\\winapps\\installed.bat" 1> /dev/null 2>&1 &
+		xfreerdp /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} +auto-reconnect +home-drive -wallpaper /span /wm-class:"RDPInstaller" /app:"C:\Windows\System32\cmd.exe" /app-cmd:"/C \\\\tsclient\\home\\.local\\share\\winapps\\installed.bat" 1> /dev/null 2>&1 &
 		COUNT=0
 		while [ ! -f "${HOME}/.local/share/winapps/installed" ]; do
 			sleep 5
@@ -84,13 +85,18 @@ function waConfigureApp() {
                     MIMETYPE="MimeType=${MIME_TYPES}"
                 fi
 		if [ ${USEDEMO} != 1 ]; then
+                        if [[ -n "${2}" ]]; then
+                            ICON="${ICO_PATH}/winapps-${1}.${2}"
+                        else
+                            ICON="winapps-${1}"
+                        fi
 			${SUDO} rm -f "${APP_PATH}/${1}.desktop"
 			echo "[Desktop Entry]
 Name=${NAME}
 Exec=${BIN_PATH}/winapps ${1} %F
 Terminal=false
 Type=Application
-Icon=${SYS_PATH}/apps/${1}/icon.${2}
+Icon=${ICON}
 StartupWMClass=${FULL_NAME}
 Comment=${FULL_NAME}
 Categories=${CATEGORIES}
@@ -131,7 +137,8 @@ function waConfigureApps() {
 		for F in $(cat "${HOME}/.local/share/winapps/installed" |sed 's/\r/\n/g'); do
 			COUNT=$((COUNT + 1))
 			${SUDO} cp -r "apps/${F}" "${SYS_PATH}/apps"
-			waConfigureApp "${F}" svg
+                        ${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/winapps-${F}.svg"
+			waConfigureApp "${F}"
 		done
 	fi
 	rm -f "${HOME}/.local/share/winapps/installed"
@@ -196,7 +203,7 @@ CATEGORIES=\"WinApps\"
 # GNOME mimetypes
 MIME_TYPES=\"\"
 " > "${SYS_PATH}/apps/${EXE}/info"
-						echo "${ICONS[$I]}" | base64 -d > "${SYS_PATH}/apps/${EXE}/icon.ico"
+						echo "${ICONS[$I]}" | base64 -d > "${ICO_PATH}/winapps-${EXE}.ico"
 						waConfigureApp "${EXE}" ico
 						COUNT=$((COUNT + 1))
 					fi
@@ -236,6 +243,9 @@ function waUninstallUser() {
 		${SUDO} rm ${F}
 		echo " Finished."
 	done
+		echo -n "  Removing winapps icons..."
+		${SUDO} rm "${ICO_PATH}/winapps-"*
+		echo " Finished."
 }
 
 function waUninstallSystem() {
@@ -274,6 +284,7 @@ if [ "${INSTALL_TYPE}" = 'User' ]; then
 	SUDO=""
 	BIN_PATH="${HOME}/.local/bin"
 	APP_PATH="${HOME}/.local/share/applications"
+	ICO_PATH="${HOME}/.local/share/icons"
 	SYS_PATH="${HOME}/.local/share/winapps"
 	if [ -n "${2}" ]; then
 		if [ "${2}" = '--uninstall' ]; then
@@ -290,6 +301,7 @@ elif [ "${INSTALL_TYPE}" = 'System' ]; then
 	sudo ls > /dev/null
 	BIN_PATH="/usr/local/bin"
 	APP_PATH="/usr/share/applications"
+	ICO_PATH="/usr/share/icons"
 	SYS_PATH="/usr/local/share/winapps"
 	if [ -n "${2}" ]; then
 		if [ "${2}" = '--uninstall' ]; then
