@@ -79,24 +79,14 @@ function waFindInstalled() {
 }
 
 function waConfigureApp() {
-		[[ -d "${SYS_PATH}/apps/${1}" ]] && . "${SYS_PATH}/apps/${1}/info"
-                if [[ ${NAME} != "Windows" ]]; then
-                    echo -n "  Configuring ${NAME}..."
-                    MIMETYPE="MimeType=${MIME_TYPES}"
-                fi
 		if [ ${USEDEMO} != 1 ]; then
-                        if [[ -n "${2}" ]]; then
-                            ICON="${ICO_PATH}/winapps-${1}.${2}"
-                        else
-                            ICON="winapps-${1}"
-                        fi
 			${SUDO} rm -f "${APP_PATH}/winapps.${1}.desktop"
 			echo "[Desktop Entry]
 Name=${NAME}
 Exec=${BIN_PATH}/${1} %F
 Terminal=false
 Type=Application
-Icon=${ICON}
+Icon=${2}
 StartupWMClass=${FULL_NAME}
 Comment=${FULL_NAME}
 Categories=${CATEGORIES}
@@ -137,8 +127,11 @@ function waConfigureApps() {
 		for F in $(cat "${HOME}/.local/share/winapps/installed" |sed 's/\r/\n/g'); do
 			COUNT=$((COUNT + 1))
 			${SUDO} cp -r "apps/${F}" "${SYS_PATH}/apps"
-                        ${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/winapps-${F}.svg"
-			waConfigureApp "${F}"
+			${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/winapps-${F}.svg"
+			[[ -d "${SYS_PATH}/apps/${F}" ]] && . "${SYS_PATH}/apps/${F}/info"
+			echo -n "  Configuring ${NAME}..."
+			MIMETYPE="MimeType=${MIME_TYPES}"
+			waConfigureApp "${F}" "winapps-${F}"
 		done
 	fi
 	rm -f "${HOME}/.local/share/winapps/installed"
@@ -200,11 +193,11 @@ WIN_EXECUTABLE=\"${EXES[$I]}\"
 # GNOME categories
 CATEGORIES=\"WinApps\"
 
-# GNOME mimetypes
-MIME_TYPES=\"\"
 " > "${SYS_PATH}/apps/${EXE}/info"
 						echo "${ICONS[$I]}" | base64 -d > "${ICO_PATH}/winapps-${EXE}.ico"
-						waConfigureApp "${EXE}" ico
+						. "${SYS_PATH}/apps/${EXE}/info"
+						echo -n "  Configuring ${NAME}..."
+						waConfigureApp "${EXE}" "${ICO_PATH}/winapps-${EXE}.ico"
 						COUNT=$((COUNT + 1))
 					fi
 				done
@@ -223,8 +216,10 @@ function waConfigureWindows() {
 	echo -n "  Configuring Windows..."
 	if [ ${USEDEMO} != 1 ]; then
 		${SUDO} rm -f "${APP_PATH}/winapps.windows.desktop"
-                ${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
-		waConfigureApp "windows" svg
+		${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
+		${SUDO} mv "${SYS_PATH}/apps/windows/icon.svg" "${ICO_PATH}/winapps-windows.svg"
+		. "${SYS_PATH}/apps/windows/info"
+		waConfigureApp "windows" "winapps-windows"
 
 	fi
 	echo " Finished."
