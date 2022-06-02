@@ -83,7 +83,7 @@ function waConfigureApp() {
 			${SUDO} rm -f "${APP_PATH}/winapps.${1}.desktop"
 			echo "[Desktop Entry]
 Name=${NAME}
-Exec=${BIN_PATH}/${1} %F
+Exec=${EXEC}${1} %F
 Terminal=false
 Type=Application
 Icon=${2}
@@ -94,7 +94,7 @@ ${MIMETYPE}
 " |${SUDO} tee "${APP_PATH}/winapps.${1}.desktop" > /dev/null
 			${SUDO} rm -f "${BIN_PATH}/${1}"
 			echo "#!/usr/bin/env bash
-${BIN_PATH}/winapps ${1} \"\$@\"
+${EXEC}winapps ${1} \"\$@\"
 " |${SUDO} tee "${BIN_PATH}/${1}" > /dev/null
 			${SUDO} chmod a+x "${BIN_PATH}/${1}"
 		fi
@@ -281,6 +281,13 @@ if [ "${INSTALL_TYPE}" = 'User' ]; then
 	APP_PATH="${HOME}/.local/share/applications"
 	ICO_PATH="${HOME}/.local/share/icons"
 	SYS_PATH="${HOME}/.local/share/winapps"
+
+	case ":${PATH}:" in
+	    *:"${HOME}/.local/bin":*)
+	        ;;
+	    *) EXEC="${BIN_PATH}/";;
+	esac
+
 	if [ -n "${2}" ]; then
 		if [ "${2}" = '--uninstall' ]; then
 			# Uninstall
