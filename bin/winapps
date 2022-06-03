@@ -73,7 +73,7 @@ if [ "${MULTIMON}" = "true" ]; then
 fi
 
 if [ "${1}" = "windows" ]; then
-	xfreerdp ${RDP_FLAGS} /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} /scale:${RDP_SCALE} /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows" /sound /microphone 1> /dev/null 2>&1 &
+	xfreerdp ${RDP_FLAGS} /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} /scale:${RDP_SCALE} /dynamic-resolution +clipboard +auto-reconnect +home-drive /t:"${RDP_WINTITLE:-"Microsoft Windows"}" /wm-class:"Microsoft Windows" /sound /microphone 1> /dev/null 2>&1 &
 elif [ "${1}" = "check" ]; then
 	dprint "CHECK"
 	xfreerdp ${RDP_FLAGS} /d:"${RDP_DOMAIN}" /u:"${RDP_USER}" /p:"${RDP_PASS}" /v:${RDP_IP} +auto-reconnect +clipboard +home-drive -wallpaper /scale:${RDP_SCALE} /dynamic-resolution /${MULTI_FLAG} /sound /microphone /app:"explorer.exe"
