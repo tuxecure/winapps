@@ -55,9 +55,10 @@ if [ -z "${RDP_IP}" ]; then
 		exit
 	fi
 	if [ -z "$(virsh list |grep ${RDP_HOSTNAME:-RDPWindows})" ]; then
-		echo "${RDP_HOSTNAME:-RDPWindows} is not running, run:"
-		echo "  virsh start ${RDP_HOSTNAME:-RDPWindows}"
-		exit
+		echo "${RDP_HOSTNAME:-RDPWindows} is not running"
+		echo "starting ${RDP_HOSTNAME:-RDPWindows}"
+                virsh start ${RDP_HOSTNAME:-RDPWindows}
+                sleep 10
 	fi
 	RDP_IP=$(virsh net-dhcp-leases default |grep ${RDP_HOSTNAME:-RDPWindows} |awk '{print $5}')
 	RDP_IP=${RDP_IP%%\/*}
