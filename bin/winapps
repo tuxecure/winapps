@@ -47,6 +47,11 @@ if [ -z "$(which xfreerdp)" ]; then
 	exit
 fi
 
+if [ -f "${HOME}/.config/winapps/${1}.rdp" ]; then
+	xfreerdp "${HOME}/.config/winapps/${1}.rdp" ${RDP_FLAGS} /scale:${RDP_SCALE} /dynamic-resolution +clipboard +auto-reconnect +home-drive /t:"${1}" /wm-class:"${1}" /sound /microphone
+        exit 0;
+fi
+
 if [ -z "${RDP_IP}" ]; then
 	if [ -z "$(groups |grep libvirt)" ]; then
 		echo "You are not a member of the libvirt group. Run the below then reboot."
