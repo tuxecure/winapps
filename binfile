@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+${EXEC}winapps ${BIN} "$@"
+

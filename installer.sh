@@ -85,9 +85,7 @@ function waConfigureApp() {
                         ${SUDO} envsubst <desktopfile > "${APP_PATH}/winapps.${BIN}.desktop"
 
 			${SUDO} rm -f "${BIN_PATH}/${BIN}"
-			echo "#!/usr/bin/env bash
-${EXEC}winapps ${BIN} \"\$@\"
-" |${SUDO} tee "${BIN_PATH}/${BIN}" > /dev/null
+                        ${SUDO} envsubst <binfile > "${BIN_PATH}/${BIN}"
 			${SUDO} chmod a+x "${BIN_PATH}/${BIN}"
 		fi
 		echo " Finished."
