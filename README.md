@@ -99,17 +99,23 @@ git clone https://github.com/Fmstrat/winapps.git
 cd winapps
 git submodule update --init
 ```
-### Step 3: Creating your WinApps configuration file
+### Step 3: Creating your WinApps configuration files
 You will need to create a `~/.config/winapps/winapps.conf` configuration file with the following information in it:
 ``` bash
-RDP_USER="MyWindowsUser"
-RDP_PASS="MyWindowsPassword"
+RDP_HOSTNAME="RDP_HOSTNAME"
 #RDP_DOMAIN="MYDOMAIN"
 #RDP_IP="192.168.123.111"
 #RDP_SCALE=100
 #RDP_FLAGS=""
 #MULTIMON="true"
 #DEBUG="true"
+```
+the `RDP_HOSTNAME` is the name you give your windows virtual machine, if you don't define this it will default to `RDPWindows`
+
+next you will need to create a `~/.config/winapps/<rdp_hostname>.rdp` configuration file with at least the following information in it
+``` rdp
+username:s:MyWindowsUser
+password:s:MyWindowsPassword
 ```
 The username and password should be a full user account and password, such as the one created when setting up Windows or a domain user. It cannot be a user/PIN combination as those are not valid for RDP access.
 
