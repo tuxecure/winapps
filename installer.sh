@@ -38,9 +38,9 @@ function waFindInstalled() {
 		cp "${DIR}/install/ExtractPrograms.ps1" ${HOME}/.local/share/winapps/ExtractPrograms.ps1
 		for F in $(ls "${DIR}/apps"); do
 			if [[ -d "${DIR}/apps/${F}" ]]; then
-                            . "${DIR}/apps/${F}/info"
+			    . "${DIR}/apps/${F}/info"
 			    [[ ${F} != "windows" ]] && echo "IF EXIST \"${WIN_EXECUTABLE}\" ECHO ${F} >> \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp" >> ${HOME}/.local/share/winapps/installed.bat
-                        fi
+			fi
 		done;
 		echo "powershell.exe -ExecutionPolicy Bypass -File \\\\tsclient\\home\\.local\\share\\winapps\\ExtractPrograms.ps1 > \\\\tsclient\home\\.local\\share\\winapps\\detected" >> ${HOME}/.local/share/winapps/installed.bat
 		echo "RENAME \\\\tsclient\\home\\.local\\share\\winapps\\installed.tmp installed" >> ${HOME}/.local/share/winapps/installed.bat
@@ -48,20 +48,20 @@ function waFindInstalled() {
 		COUNT=0
 		while [ ! -f "${HOME}/.local/share/winapps/installed" ]; do
 			sleep 5
-                        echo $((15-${COUNT}))
+			echo $((15-${COUNT}))
 			COUNT=$((COUNT + 1))
 			if (( COUNT == 15 )); then
 				echo " Finished."
 				echo ""
 				echo "The RDP connection failed to connect or run. Please confirm FreeRDP can connect with:"
-				echo "  bin/winapps check"
+				echo "	bin/winapps check"
 				echo ""
 				echo "If it cannot connect, this is most likely due to:"
-				echo "  - You need to accept the security cert the first time you connect (with 'check')"
-				echo "  - Not enabling RDP in the Windows VM"
-				echo "  - Not being able to connect to the IP of the VM"
-				echo "  - Incorrect user credentials in winapps.conf"
-				echo "  - Not merging install/RDPApps.reg into the VM"
+				echo "	- You need to accept the security cert the first time you connect (with 'check')"
+				echo "	- Not enabling RDP in the Windows VM"
+				echo "	- Not being able to connect to the IP of the VM"
+				echo "	- Incorrect user credentials in winapps.conf"
+				echo "	- Not merging install/RDPApps.reg into the VM"
 				exit
 			fi
 		done
@@ -79,13 +79,13 @@ function waFindInstalled() {
 }
 
 function waConfigureApp() {
-                BIN=${1}
+		BIN=${1}
 		if [ ${USEDEMO} != 1 ]; then
 			${SUDO} rm -f "${APP_PATH}/winapps.${BIN}.desktop"
-                        ${SUDO} envsubst <desktopfile > "${APP_PATH}/winapps.${BIN}.desktop"
+			${SUDO} envsubst <desktopfile > "${APP_PATH}/winapps.${BIN}.desktop"
 
 			${SUDO} rm -f "${BIN_PATH}/${BIN}"
-                        ${SUDO} envsubst <binfile > "${BIN_PATH}/${BIN}"
+			${SUDO} envsubst <binfile > "${BIN_PATH}/${BIN}"
 			${SUDO} chmod a+x "${BIN_PATH}/${BIN}"
 		fi
 		echo " Finished."
@@ -117,20 +117,20 @@ function waConfigureApps() {
 		for F in $(cat "${HOME}/.local/share/winapps/installed" |sed 's/\r/\n/g'); do
 			COUNT=$((COUNT + 1))
 			${SUDO} cp -r "apps/${F}" "${SYS_PATH}/apps"
-                        set -a
-                        ICON="winapps-${F}";
+			set -a
+			ICON="winapps-${F}";
 			${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/${ICON}.svg"
 			[[ -d "${SYS_PATH}/apps/${F}" ]] && . "${SYS_PATH}/apps/${F}/info"
 			echo -n "  Configuring ${NAME}..."
 			MIMETYPE="MimeType=${MIME_TYPES}"
 			waConfigureApp "${F}"
-                        set +a
+			set +a
 		done
 	fi
 	rm -f "${HOME}/.local/share/winapps/installed"
 	rm -f "${HOME}/.local/share/winapps/installed.bat"
 	if (( $COUNT == 0 )); then
-		echo "  No configured applications."
+		echo "	No configured applications."
 	fi
 }
 
@@ -187,13 +187,13 @@ WIN_EXECUTABLE=\"${EXES[$I]}\"
 CATEGORIES=\"WinApps\"
 
 " > "${SYS_PATH}/apps/${EXE}/info"
-                                                set -a
-                                                ICON="${ICO_PATH}/winapps-${EXE}.ico"
+						set -a
+						ICON="${ICO_PATH}/winapps-${EXE}.ico"
 						echo "${ICONS[$I]}" | base64 -d > "${ICON}"
 						. "${SYS_PATH}/apps/${EXE}/info"
 						echo -n "  Configuring ${NAME}..."
 						waConfigureApp "${EXE}"
-                                                set +a
+						set +a
 						COUNT=$((COUNT + 1))
 					fi
 				done
@@ -202,7 +202,7 @@ CATEGORIES=\"WinApps\"
 		fi
 		rm -f "${HOME}/.local/share/winapps/installed.bat"
 		if (( $COUNT == 0 )); then
-			echo "  No configured applications."
+			echo "	No configured applications."
 		fi
 	fi
 }
@@ -213,12 +213,12 @@ function waConfigureWindows() {
 	if [ ${USEDEMO} != 1 ]; then
 		${SUDO} rm -f "${APP_PATH}/winapps.windows.desktop"
 		${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
-                set -a
-                ICON="winapps-windows"
+		set -a
+		ICON="winapps-windows"
 		${SUDO} mv "${SYS_PATH}/apps/windows/icon.svg" "${ICO_PATH}/${ICON}.svg"
 		. "${SYS_PATH}/apps/windows/info"
 		waConfigureApp "windows"
-                set +a
+		set +a
 
 	fi
 	echo " Finished."
@@ -283,7 +283,7 @@ if [ "${INSTALL_TYPE}" = 'User' ]; then
 
 	case ":${PATH}:" in
 	    *:"${HOME}/.local/bin":*)
-	        ;;
+		;;
 	    *) EXEC="${BIN_PATH}/";;
 	esac
 
