@@ -79,24 +79,16 @@ function waFindInstalled() {
 }
 
 function waConfigureApp() {
+                BIN=${1}
 		if [ ${USEDEMO} != 1 ]; then
-			${SUDO} rm -f "${APP_PATH}/winapps.${1}.desktop"
-			echo "[Desktop Entry]
-Name=${NAME}
-Exec=${EXEC}${1} %F
-Terminal=false
-Type=Application
-Icon=${2}
-StartupWMClass=${FULL_NAME}
-Comment=${FULL_NAME}
-Categories=${CATEGORIES}
-${MIMETYPE}
-" |${SUDO} tee "${APP_PATH}/winapps.${1}.desktop" > /dev/null
-			${SUDO} rm -f "${BIN_PATH}/${1}"
+			${SUDO} rm -f "${APP_PATH}/winapps.${BIN}.desktop"
+                        ${SUDO} envsubst <desktopfile > "${APP_PATH}/winapps.${BIN}.desktop"
+
+			${SUDO} rm -f "${BIN_PATH}/${BIN}"
 			echo "#!/usr/bin/env bash
-${EXEC}winapps ${1} \"\$@\"
-" |${SUDO} tee "${BIN_PATH}/${1}" > /dev/null
-			${SUDO} chmod a+x "${BIN_PATH}/${1}"
+${EXEC}winapps ${BIN} \"\$@\"
+" |${SUDO} tee "${BIN_PATH}/${BIN}" > /dev/null
+			${SUDO} chmod a+x "${BIN_PATH}/${BIN}"
 		fi
 		echo " Finished."
 }
@@ -127,11 +119,14 @@ function waConfigureApps() {
 		for F in $(cat "${HOME}/.local/share/winapps/installed" |sed 's/\r/\n/g'); do
 			COUNT=$((COUNT + 1))
 			${SUDO} cp -r "apps/${F}" "${SYS_PATH}/apps"
-			${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/winapps-${F}.svg"
+                        set -a
+                        ICON="winapps-${F}";
+			${SUDO} mv "${SYS_PATH}/apps/${F}/icon.svg" "${ICO_PATH}/${ICON}.svg"
 			[[ -d "${SYS_PATH}/apps/${F}" ]] && . "${SYS_PATH}/apps/${F}/info"
 			echo -n "  Configuring ${NAME}..."
 			MIMETYPE="MimeType=${MIME_TYPES}"
-			waConfigureApp "${F}" "winapps-${F}"
+			waConfigureApp "${F}"
+                        set +a
 		done
 	fi
 	rm -f "${HOME}/.local/share/winapps/installed"
@@ -194,10 +189,13 @@ WIN_EXECUTABLE=\"${EXES[$I]}\"
 CATEGORIES=\"WinApps\"
 
 " > "${SYS_PATH}/apps/${EXE}/info"
-						echo "${ICONS[$I]}" | base64 -d > "${ICO_PATH}/winapps-${EXE}.ico"
+                                                set -a
+                                                ICON="${ICO_PATH}/winapps-${EXE}.ico"
+						echo "${ICONS[$I]}" | base64 -d > "${ICON}"
 						. "${SYS_PATH}/apps/${EXE}/info"
 						echo -n "  Configuring ${NAME}..."
-						waConfigureApp "${EXE}" "${ICO_PATH}/winapps-${EXE}.ico"
+						waConfigureApp "${EXE}"
+                                                set +a
 						COUNT=$((COUNT + 1))
 					fi
 				done
@@ -217,9 +215,12 @@ function waConfigureWindows() {
 	if [ ${USEDEMO} != 1 ]; then
 		${SUDO} rm -f "${APP_PATH}/winapps.windows.desktop"
 		${SUDO} cp -r "apps/windows" "${SYS_PATH}/apps"
-		${SUDO} mv "${SYS_PATH}/apps/windows/icon.svg" "${ICO_PATH}/winapps-windows.svg"
+                set -a
+                ICON="winapps-windows"
+		${SUDO} mv "${SYS_PATH}/apps/windows/icon.svg" "${ICO_PATH}/${ICON}.svg"
 		. "${SYS_PATH}/apps/windows/info"
-		waConfigureApp "windows" "winapps-windows"
+		waConfigureApp "windows"
+                set +a
 
 	fi
 	echo " Finished."

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=${NAME}
+Exec=${EXEC}${BIN} %F
+Terminal=false
+Type=Application
+Icon=${ICON}
+StartupWMClass=${FULL_NAME}
+Comment=${FULL_NAME}
+Categories=${CATEGORIES}
+${MIMETYPE}
+
