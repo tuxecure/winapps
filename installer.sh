@@ -237,9 +237,11 @@ function waUninstallUser() {
 		${SUDO} rm ${F}
 		echo " Finished."
 	done
-		echo -n "  Removing winapps icons..."
-		${SUDO} rm "${ICO_PATH}/winapps-"*
+	for F in $(ls "${ICO_PATH}/winapps-"*); do
+		echo -n "  Removing ${F}..."
+		${SUDO} rm "${F}"
 		echo " Finished."
+	done
 }
 
 function waUninstallSystem() {
