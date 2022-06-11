@@ -227,12 +227,12 @@ function waConfigureWindows() {
 function waUninstallUser() {
 	rm -f "${HOME}/.local/bin/winapps"
 	rm -rf "${HOME}/.local/share/winapps"
-	for F in $(grep -l -d skip "bin/winapps" "${HOME}/.local/share/applications/"*); do
+	for F in $(grep -l -d skip "winapps" "${APP_PATH}/winapps."*); do
 		echo -n "  Removing ${F}..."
 		${SUDO} rm ${F}
 		echo " Finished."
 	done
-	for F in $(grep -l -d skip "bin/winapps" "${HOME}/.local/bin/"*); do
+	for F in $(grep -l -d skip "winapps" "${BIN_PATH}/"*); do
 		echo -n "  Removing ${F}..."
 		${SUDO} rm ${F}
 		echo " Finished."
