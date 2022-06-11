@@ -319,8 +319,8 @@ elif [ "${INSTALL_TYPE}" = 'System' ]; then
 fi
 
 echo "Removing any old configurations..."
-waUninstallUser
-waUninstallSystem
+[[ -f ${HOME}/.local/bin/winapps ]] && waUninstallUser
+[[ -f /usr/local/bin/winapps ]] && waUninstallSystem
 
 echo "Installing..."
 
