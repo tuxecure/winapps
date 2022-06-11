@@ -82,10 +82,10 @@ function waConfigureApp() {
 		BIN=${1}
 		if [ ${USEDEMO} != 1 ]; then
 			${SUDO} rm -f "${APP_PATH}/winapps.${BIN}.desktop"
-			${SUDO} envsubst <desktopfile > "${APP_PATH}/winapps.${BIN}.desktop"
+			${SUDO} envsubst <"${DIR}/install/desktopfile" > "${APP_PATH}/winapps.${BIN}.desktop"
 
 			${SUDO} rm -f "${BIN_PATH}/${BIN}"
-			${SUDO} envsubst <binfile > "${BIN_PATH}/${BIN}"
+			${SUDO} envsubst <"${DIR}/install/binfile" > "${BIN_PATH}/${BIN}"
 			${SUDO} chmod a+x "${BIN_PATH}/${BIN}"
 		fi
 		echo " Finished."
